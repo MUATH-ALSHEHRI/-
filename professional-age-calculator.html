@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة العمر الاحترافية</title>
+    <style>
+        /* === CSS Reset === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* === المتغيرات === */
+        :root {
+            --primary-color: #8B5CF6;
+            --secondary-color: #3B82F6;
+            --success-color: #10B981;
+            --background-color: #F9FAFB;
+            --card-background: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        /* === التنسيقات الأساسية === */
+        body {
+            background: var(--background-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* === العنوان الرئيسي === */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* === البطاقة الرئيسية === */
+        .card {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            transition: transform var(--transition-speed);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* === نموذج الإدخال === */
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: all var(--transition-speed);
+            outline: none;
+        }
+
+        .date-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        /* === الأزرار === */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .button {
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            border: none;
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            flex: 1;
+        }
+
+        .button-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .button-secondary {
+            background: transparent;
+            border: 2px solid #E5E7EB;
+            color: var(--text-secondary);
+        }
+
+        .button-secondary:hover {
+            background: #F9FAFB;
+        }
+
+        /* === النتائج === */
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .results.show {
+            opacity: 1;
+        }
+
+        .result-card {
+            background: var(--card-background);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .result-card:hover {
+            transform: scale(1.05);
+        }
+
+        .result-title {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* === التحريكات === */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            width: 30%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: loading 1s infinite;
+        }
+
+        @keyframes loading {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(-200%);
+            }
+        }
+
+        /* === تجاوب الموقع === */
+        @media (max-width: 640px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- العنوان -->
+        <header class="header">
+            <h1 class="title">حاسبة العمر الاحترافية</h1>
+            <p class="subtitle">اكتشف عمرك بالتفصيل: السنوات، الأشهر، الأيام، والمزيد</p>
+        </header>
+
+        <!-- نموذج الإدخال -->
+        <div class="card">
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <input 
+                        type="date" 
+                        id="birthDate" 
+                        class="date-input"
+                        max="2024-12-31"
+                    >
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button 
+                    onclick="calculateAge()" 
+                    id="calculateBtn" 
+                    class="button button-primary"
+                >
+                    احسب العمر
+                </button>
+                
+                <button 
+                    onclick="resetCalculator()" 
+                    id="resetBtn" 
+                    class="button button-secondary" 
+                    style="display: none;"
+                >
+                    إعادة ضبط
+                </button>
+            </div>
+        </div>
+
+        <!-- النتائج -->
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        // === تهيئة التطبيق ===
+        document.addEventListener('DOMContentLoaded', () => {
+            // تحديد الحد الأقصى للتاريخ (اليوم)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('birthDate').setAttribute('max', today);
+        });
+
+        // === حساب العمر ===
+        function calculateAge() {
+            const birthDate = document.getElementById('birthDate').value;
+            if (!birthDate) {
+                showError('الرجاء اختيار تاريخ الميلاد');
+                return;
+            }
+
+            // إظهار حالة التحميل
+            const calculateBtn = document.getElementById('calculateBtn');
+            calculateBtn.classList.add('loading');
+            
+            // محاكاة وقت المعالجة
+            setTimeout(() => {
+                const birth = new Date(birthDate);
+                const today = new Date();
+                
+                // التحقق من صحة التاريخ
+                if (birth > today) {
+                    showError('تاريخ الميلاد لا يمكن أن يكون في المستقبل');
+                    calculateBtn.classList.remove('loading');
+                    return;
+                }
+
+                // حساب الفروق الزمنية
+                const ageData = calculateAgeDetails(birth, today);
+                
+                // عرض النتائج
+                displayResults(ageData);
+                
+                // إزالة حالة التحميل وإظهار زر إعادة الضبط
+                calculateBtn.classList.remove('loading');
+                document.getElementById('resetBtn').style.display = 'block';
+            }, 800);
+        }
+
+        // === حساب تفاصيل العمر ===
+        function calculateAgeDetails(birth, today) {
+            let years = today.getFullYear() - birth.getFullYear();
+            let months = today.getMonth() - birth.getMonth();
+            let days = today.getDate() - birth.getDate();
+            
+            // تصحيح الحسابات
+            if (days < 0) {
+                months--;
+                const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+            
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            const totalDays = Math.floor((today - birth) / (1000 * 60 * 60 * 24));
+            const totalMonths = years * 12 + months;
+            const weeks = Math.floor(totalDays / 7);
+            const hours = Math.floor(totalDays * 24);
+            
+            return {
+                years,
+                months,
+                days,
+                totalMonths,
+                totalDays,
+                weeks,
+                hours
+            };
+        }
+
+        // === عرض النتائج ===
+        function displayResults(ageData) {
+            const results = [
+                {
+                    title: 'العمر الكامل',
+                    value: `${ageData.years} سنة، ${ageData.months} شهر، ${ageData.days} يوم`,
+                    color: '#8B5CF6'
+                },
+                {
+                    title: 'إجمالي الأشهر',
+                    value: `${ageData.totalMonths} شهر`,
+                    color: '#3B82F6'
+                },
+                {
+                    title: 'إجمالي الأسابيع',
+                    value: `${ageData.weeks} أسبوع`,
+                    color: '#10B981'
+                },
+                {
+                    title: 'إجمالي الأيام',
+                    value: `${ageData.totalDays} يوم`,
+                    color: '#6366F1'
+                },
+                {
+                    title: 'إجمالي الساعات',
+                    value: `${ageData.hours.toLocaleString()} ساعة`,
+                    color: '#EC4899'
+                }
+            ];
+
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = results.map(item => `
+                <div class="result-card">
+                    <h3 class="result-title">${item.title}</h3>
+                    <p class="result-value" style="color: ${item.color}">${item.value}</p>
+                </div>
+            `).join('');
+
+            resultsContainer.classList.add('show');
+        }
+
+        // === إعادة ضبط الحاسبة ===
+        function resetCalculator() {
+            document.getElementById('birthDate').value = '';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('resetBtn').style.display = 'none';
+        }
+
+        // === عرض رسائل الخطأ ===
+        function showError(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>
